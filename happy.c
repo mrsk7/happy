@@ -47,6 +47,28 @@ computeAllHappy(bool *array, int size) {
 		else array[i] = false;
 	}
 }
+
+
+void countHappyNumbers(int **p,bool *happy,int N) {
+    int exp = getNumOfDigits(N);
+    printf("exp is %d\n",exp);
+    int i,j,offset;
+    //Init first row, thus set p[0][1],p[0][4],p[0][9],p[0][16]...p[0][81] to 1
+    for (i=1;i<=9;i++) p[0][i*i] = 1;
+    for (i=1;i<=9;i++) printf("%d\n",p[0][i*i]);
+    
+    for (i=1;i<=9;i++) {
+        printf("i is %d\n",i);
+        printf("j limit is %d\n",(i-1)*81);
+        for (j=0;j<=(i-1)*81;j++) {
+            printf("  j is %d\n",j);
+            for (offset=0;offset<10;offset++) {
+                printf("previous: p[%d][%d]=%d, after :p[%d][%d]=%d\n",i-1,j,p[i-1][j],i,j+offset*offset,p[i][j+offset*offset]);
+                p[i][j+offset*offset]+=p[i-1][j];
+            }
+        }
+    }
+}
     
 int main (int argc, char *argv[]) {
     char *input = argv[1] ;
@@ -65,10 +87,28 @@ int main (int argc, char *argv[]) {
 	int max = pwr*81;			//Maximum sum of squares that can be found is pwr*81 where pwr is the number of digits of digits
 	bool *happy = (bool *) malloc(max*sizeof(bool)+1);	//Allocation of array with size max
 	if (happy==NULL) {
-		printf("Error allocating memory\n");
+		printf("Error allocating memory(happy)\n");
 		exit(1);
 	}
 	computeAllHappy(happy,max);		//Compute all happy numbers up to max. Maximum for max is 732=9*81
+	pwr=getNumOfDigits(A);
+        max=pwr*81;
+        int **array = malloc(pwr*sizeof(int *)+1);	//Allocation of array with size A
+	if (array==NULL) {
+		printf("Error allocating memory(array)\n");
+		exit(1);
+	}
+        for (i=0;i<pwr+1;i++) {
+            array[i] = malloc(max*sizeof(int)+1);
+            if (array[i]==NULL) {
+                    printf("Error allocating memory(array[i])\n");
+                    exit(1);
+            }
+        }
+        printf("Successfully allocated array[%d][%d]\n",pwr+1,max+1);
+        printf("A is %d\n",A);
+        countHappyNumbers(array,happy,A);
+        free(array);
 	free(happy);
 	fclose(file);
 	return 0;
